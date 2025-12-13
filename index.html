@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Xitoy Tilini O'rganish (Easy Steps to Chinese 1)</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0fdf4;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .cn-font {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .card-inner {
+            transition: transform 0.4s;
+            transform-style: preserve-3d;
+        }
+        .card.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .lesson-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .lesson-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .lesson-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Data extracted from "Easy Steps to Chinese Textbook 1" (Lessons 1-15)
+        const lessonData = [
+            {
+                id: 1,
+                title: "第2课：拼音、数字",
+                words: [
+                    { cn: "一", pinyin: "yī", uz: "Bir", en: "One" },
+                    { cn: "二", pinyin: "èr", uz: "Ikki", en: "Two" },
+                    { cn: "三", pinyin: "sān", uz: "Uch", en: "Three" },
+                    { cn: "四", pinyin: "sì", uz: "To'rt", en: "Four" },
+                    { cn: "五", pinyin: "wǔ", uz: "Besh", en: "Five" },
+                    { cn: "六", pinyin: "liù", uz: "Olti", en: "Six" },
+                    { cn: "七", pinyin: "qī", uz: "Yetti", en: "Seven" },
+                    { cn: "八", pinyin: "bā", uz: "Sakkiz", en: "Eight" },
+                    { cn: "九", pinyin: "jiǔ", uz: "To'qqiz", en: "Nine" },
+                    { cn: "十", pinyin: "shí", uz: "O'n", en: "Ten" },
+                    { cn: "十一", pinyin: "shí yī", uz: "O'n bir", en: "Eleven" },
+                    { cn: "十九", pinyin: "shí jiǔ", uz: "O'n to'qqiz", en: "Nineteen" },
+                    { cn: "二十", pinyin: "èr shí", uz: "Yigirma", en: "Twenty" },
+                    { cn: "二十五", pinyin: "èr shí wǔ", uz: "Yigirma besh", en: "Twenty-five" },
+                    { cn: "九十九", pinyin: "jiǔ shí jiǔ", uz: "To'qson to'qqiz", en: "Ninety-nine" }
+                ]
+            },
+            {
+                id: 2,
+                title: "第3课：问候 (一)",
+                words: [
+                    { cn: "您", pinyin: "nín", uz: "Siz (hurmat bilan)", en: "You (polite)" },
+                    { cn: "好", pinyin: "hǎo", uz: "Yaxshi", en: "Good / Well" },
+                    { cn: "您好", pinyin: "nín hǎo", uz: "Assalomu alaykum", en: "Hello (polite)" },
+                    { cn: "你", pinyin: "nǐ", uz: "Sen", en: "You" },
+                    { cn: "你好", pinyin: "nǐ hǎo", uz: "Salom", en: "Hello" },
+                    { cn: "再", pinyin: "zài", uz: "Qayta / Yana", en: "Again" },
+                    { cn: "见", pinyin: "jiàn", uz: "Ko'rmoq", en: "See" },
+                    { cn: "再见", pinyin: "zài jiàn", uz: "Xayr / Ko'rishguncha", en: "Goodbye" }
+                ]
+            },
+            {
+                id: 3,
+                title: "第3课：问候 (二)",
+                words: [
+                    { cn: "叫", pinyin: "jiào", uz: "Chaqirmoq / Ismi ...", en: "To be called" },
+                    { cn: "什么", pinyin: "shén me", uz: "Nima", en: "What" },
+                    { cn: "名字", pinyin: "míng zi", uz: "Ism", en: "Name" },
+                    { cn: "我", pinyin: "wǒ", uz: "Men", en: "I / Me" },
+                    { cn: "字", pinyin: "zì", uz: "Belgi / Xat", en: "Character / Word" },
+                    { cn: "小", pinyin: "xiǎo", uz: "Kichik", en: "Small" },
+                    { cn: "月", pinyin: "yuè", uz: "Oy", en: "Moon / Month" },
+                    { cn: "大", pinyin: "dà", uz: "Katta", en: "Big" },
+                    { cn: "生", pinyin: "shēng", uz: "Tug'ilmoq / Talaba", en: "Born / Student" }
+                ]
+            },
+            {
+                id: 4,
+                title: "第4课：日期",
+                words: [
+                    { cn: "月", pinyin: "yuè", uz: "Oy", en: "Month" },
+                    { cn: "星", pinyin: "xīng", uz: "Yulduz", en: "Star" },
+                    { cn: "期", pinyin: "qī", uz: "Davr", en: "Period" },
+                    { cn: "星期", pinyin: "xīng qī", uz: "Hafta", en: "Week" },
+                    { cn: "星期一", pinyin: "xīng qī yī", uz: "Dushanba", en: "Monday" },
+                    { cn: "天", pinyin: "tiān", uz: "Kun / Osmon", en: "Day / Sky" },
+                    { cn: "日", pinyin: "rì", uz: "Kun / Quyosh", en: "Day / Sun" },
+                    { cn: "星期日", pinyin: "xīng qī rì", uz: "Yakshanba", en: "Sunday" },
+                    { cn: "今", pinyin: "jīn", uz: "Hozir / Bugun", en: "Now / Present" },
+                    { cn: "今天", pinyin: "jīn tiān", uz: "Bugun", en: "Today" },
+                    { cn: "年", pinyin: "nián", uz: "Yil", en: "Year" },
+                    { cn: "今年", pinyin: "jīn nián", uz: "Bu yil", en: "This year" },
+                    { cn: "是", pinyin: "shì", uz: "Bo'lmoq (to be)", en: "To be (is/am/are)" },
+                    { cn: "号", pinyin: "hào", uz: "Raqam / Sana", en: "Number / Date" },
+                    { cn: "昨", pinyin: "zuó", uz: "Kecha (kun)", en: "Yesterday" },
+                    { cn: "昨天", pinyin: "zuó tiān", uz: "Kecha", en: "Yesterday" },
+                    { cn: "几", pinyin: "jǐ", uz: "Nechta / Qancha", en: "How many" },
+                    { cn: "明", pinyin: "míng", uz: "Yorug' / Kelasi", en: "Bright / Next" },
+                    { cn: "明天", pinyin: "míng tiān", uz: "Ertaga", en: "Tomorrow" }
+                ]
+            },
+            {
+                id: 5,
+                title: "第5课：年龄",
+                words: [
+                    { cn: "在", pinyin: "zài", uz: "da (joylashuv)", en: "At / In / On" },
+                    { cn: "出", pinyin: "chū", uz: "Chiqmoq", en: "Go out" },
+                    { cn: "出生", pinyin: "chū shēng", uz: "Tug'ilmoq", en: "To be born" },
+                    { cn: "的", pinyin: "de", uz: "ning (egalik)", en: "Of / 's" },
+                    { cn: "生日", pinyin: "shēng rì", uz: "Tug'ilgan kun", en: "Birthday" },
+                    { cn: "王", pinyin: "wáng", uz: "Qirol / Familiya", en: "King / Surname Wang" },
+                    { cn: "多", pinyin: "duō", uz: "Ko'p", en: "Many / Much" },
+                    { cn: "了", pinyin: "le", uz: "(O'tgan zamon)", en: "(Particle)" },
+                    { cn: "他", pinyin: "tā", uz: "U (o'g'il bola)", en: "He" },
+                    { cn: "文", pinyin: "wén", uz: "Madaniyat / Yozuv", en: "Culture / Script" },
+                    { cn: "岁", pinyin: "suì", uz: "Yosh", en: "Year of age" },
+                    { cn: "她", pinyin: "tā", uz: "U (qiz bola)", en: "She" },
+                    { cn: "几岁", pinyin: "jǐ suì", uz: "Necha yosh", en: "How old (<10)" },
+                    { cn: "多大", pinyin: "duō dà", uz: "Necha yoshda", en: "How old (>10)" }
+                ]
+            },
+            {
+                id: 6,
+                title: "第6课：电话号码",
+                words: [
+                    { cn: "家", pinyin: "jiā", uz: "Uy / Oila", en: "Family / Home" },
+                    { cn: "电", pinyin: "diàn", uz: "Elektr", en: "Electricity" },
+                    { cn: "话", pinyin: "huà", uz: "So'z / Gap", en: "Word / Talk" },
+                    { cn: "电话", pinyin: "diàn huà", uz: "Telefon", en: "Telephone" },
+                    { cn: "码", pinyin: "mǎ", uz: "Kod / Raqam", en: "Number / Code" },
+                    { cn: "号码", pinyin: "hào mǎ", uz: "Raqam", en: "Number" },
+                    { cn: "少", pinyin: "shǎo", uz: "Kam", en: "Few / Little" },
+                    { cn: "多少", pinyin: "duō shao", uz: "Qancha / Nechta", en: "How many / How much" },
+                    { cn: "住", pinyin: "zhù", uz: "Yashamoq", en: "To live" },
+                    { cn: "哪", pinyin: "nǎ", uz: "Qaysi", en: "Which" },
+                    { cn: "儿", pinyin: "r", uz: "(Qo'shimcha)", en: "(Suffix)" },
+                    { cn: "哪儿", pinyin: "nǎr", uz: "Qayer", en: "Where" },
+                    { cn: "北京", pinyin: "Běi jīng", uz: "Pekin", en: "Beijing" }
+                ]
+            },
+            {
+                id: 7,
+                title: "第7课：家庭成员",
+                words: [
+                    { cn: "有", pinyin: "yǒu", uz: "Bor bo'lmoq", en: "To have" },
+                    { cn: "口", pinyin: "kǒu", uz: "Og'iz / Jon", en: "Mouth / Measure word" },
+                    { cn: "人", pinyin: "rén", uz: "Odam", en: "Person" },
+                    { cn: "爸", pinyin: "bà", uz: "Ota", en: "Dad" },
+                    { cn: "爸爸", pinyin: "bà ba", uz: "Dada", en: "Father / Dad" },
+                    { cn: "妈", pinyin: "mā", uz: "Ona", en: "Mum" },
+                    { cn: "妈妈", pinyin: "mā ma", uz: "Oyi", en: "Mother / Mum" },
+                    { cn: "兄", pinyin: "xiōng", uz: "Aka", en: "Elder brother" },
+                    { cn: "哥哥", pinyin: "gē ge", uz: "Aka", en: "Elder brother" },
+                    { cn: "兄弟姐妹", pinyin: "xiōng dì jiě mèi", uz: "Aka-uka va opa-singillar", en: "Siblings" },
+                    { cn: "和", pinyin: "hé", uz: "Va / Bilan", en: "And" },
+                    { cn: "谁", pinyin: "shéi", uz: "Kim", en: "Who" },
+                    { cn: "弟", pinyin: "dì", uz: "Uka", en: "Younger brother" },
+                    { cn: "弟弟", pinyin: "dì di", uz: "Uka", en: "Younger brother" },
+                    { cn: "妹", pinyin: "mèi", uz: "Singil", en: "Younger sister" },
+                    { cn: "妹妹", pinyin: "mèi mei", uz: "Singil", en: "Younger sister" },
+                    { cn: "姐", pinyin: "jiě", uz: "Opa", en: "Elder sister" },
+                    { cn: "姐姐", pinyin: "jiě jie", uz: "Opa", en: "Elder sister" },
+                    { cn: "这", pinyin: "zhè", uz: "Bu", en: "This" },
+                    { cn: "个", pinyin: "gè", uz: "Ta (sanoq so'z)", en: "(Measure word)" },
+                    { cn: "那", pinyin: "nà", uz: "Anavi", en: "That" }
+                ]
+            },
+            {
+                id: 8,
+                title: "第8课：自我介绍",
+                words: [
+                    { cn: "没", pinyin: "méi", uz: "Yo'q", en: "No" },
+                    { cn: "没有", pinyin: "méi yǒu", uz: "Yo'q (bor emas)", en: "Not have" },
+                    { cn: "中", pinyin: "zhōng", uz: "O'rta", en: "Middle" },
+                    { cn: "学", pinyin: "xué", uz: "O'qimoq", en: "Study" },
+                    { cn: "学生", pinyin: "xué sheng", uz: "O'quvchi", en: "Student" },
+                    { cn: "中学生", pinyin: "zhōng xué sheng", uz: "O'rta maktab o'quvchisi", en: "Secondary school student" },
+                    { cn: "上", pinyin: "shàng", uz: "Yuqori / Bormoq", en: "Up / Go to" },
+                    { cn: "级", pinyin: "jí", uz: "Daraja", en: "Grade / Level" },
+                    { cn: "年级", pinyin: "nián jí", uz: "Sinf (maktabda)", en: "Grade" },
+                    { cn: "香港", pinyin: "Xiāng gǎng", uz: "Gonkong", en: "Hong Kong" },
+                    { cn: "吗", pinyin: "ma", uz: "mi (so'roq)", en: "(Question particle)" },
+                    { cn: "不", pinyin: "bù", uz: "Yo'q / Emas", en: "Not / No" },
+                    { cn: "小学生", pinyin: "xiǎo xué sheng", uz: "Boshlang'ich sinf o'quvchisi", en: "Primary school student" },
+                    { cn: "呢", pinyin: "ne", uz: "chi? (savol)", en: "What about...?" },
+                    { cn: "半", pinyin: "bàn", uz: "Yarim", en: "Half" },
+                    { cn: "一半", pinyin: "yí bàn", uz: "Bir yarim / Yarmi", en: "One half" },
+                    { cn: "国", pinyin: "guó", uz: "Davlat", en: "Country" },
+                    { cn: "中国", pinyin: "Zhōng guó", uz: "Xitoy", en: "China" },
+                    { cn: "中国人", pinyin: "Zhōng guó rén", uz: "Xitoylik", en: "Chinese person" },
+                    { cn: "美国", pinyin: "Měi guó", uz: "Amerika", en: "USA" },
+                    { cn: "美国人", pinyin: "Měi guó rén", uz: "Amerikalik", en: "American person" },
+                    { cn: "英国", pinyin: "Yīng guó", uz: "Buyuk Britaniya", en: "UK" },
+                    { cn: "加拿大", pinyin: "Jiā ná dà", uz: "Kanada", en: "Canada" },
+                    { cn: "德国", pinyin: "Dé guó", uz: "Germaniya", en: "Germany" },
+                    { cn: "法国", pinyin: "Fǎ guó", uz: "Fransiya", en: "France" },
+                    { cn: "韩国", pinyin: "Hán guó", uz: "Janubiy Koreya", en: "South Korea" },
+                    { cn: "日本", pinyin: "Rì běn", uz: "Yaponiya", en: "Japan" },
+                    { cn: "澳大利亚", pinyin: "Ào dà lì yà", uz: "Avstraliya", en: "Australia" }
+                ]
+            },
+            {
+                id: 9,
+                title: "第9课：职业",
+                words: [
+                    { cn: "工", pinyin: "gōng", uz: "Ish", en: "Work" },
+                    { cn: "作", pinyin: "zuò", uz: "Bajarmoq", en: "Do / Make" },
+                    { cn: "工作", pinyin: "gōng zuò", uz: "Ish / Ishlamoq", en: "Work / Job" },
+                    { cn: "也", pinyin: "yě", uz: "Ham", en: "Also" },
+                    { cn: "律", pinyin: "lǜ", uz: "Qonun", en: "Law" },
+                    { cn: "师", pinyin: "shī", uz: "Ustoz", en: "Teacher / Master" },
+                    { cn: "律师", pinyin: "lǜ shī", uz: "Advokat", en: "Lawyer" },
+                    { cn: "老", pinyin: "lǎo", uz: "Qari / Tajribali", en: "Old" },
+                    { cn: "老师", pinyin: "lǎo shī", uz: "O'qituvchi", en: "Teacher" },
+                    { cn: "们", pinyin: "men", uz: "lar (ko'plik)", en: "(Plural suffix)" },
+                    { cn: "我们", pinyin: "wǒ men", uz: "Biz", en: "We / Us" },
+                    { cn: "一家", pinyin: "yì jiā", uz: "Butun oila", en: "Whole family" },
+                    { cn: "上海", pinyin: "Shàng hǎi", uz: "Shanxay", en: "Shanghai" },
+                    { cn: "独", pinyin: "dú", uz: "Yolg'iz", en: "Single / Only" },
+                    { cn: "女", pinyin: "nǚ", uz: "Ayol / Qiz", en: "Female / Daughter" },
+                    { cn: "独生女", pinyin: "dú shēng nǚ", uz: "Yagona qiz farzand", en: "Only daughter" },
+                    { cn: "子", pinyin: "zǐ", uz: "O'g'il / Bola", en: "Son / Child" },
+                    { cn: "独生子", pinyin: "dú shēng zǐ", uz: "Yagona o'g'il farzand", en: "Only son" },
+                    { cn: "商", pinyin: "shāng", uz: "Savdo", en: "Business" },
+                    { cn: "商人", pinyin: "shāng rén", uz: "Tadbirkor", en: "Businessman" },
+                    { cn: "做", pinyin: "zuò", uz: "Qilmoq", en: "Do / Make" },
+                    { cn: "秘", pinyin: "mì", uz: "Sirli", en: "Secret" },
+                    { cn: "书", pinyin: "shū", uz: "Kitob", en: "Book" },
+                    { cn: "秘书", pinyin: "mì shū", uz: "Kotib(a)", en: "Secretary" },
+                    { cn: "护士", pinyin: "hù shi", uz: "Hamshira", en: "Nurse" },
+                    { cn: "医生", pinyin: "yī shēng", uz: "Shifokor", en: "Doctor" },
+                    { cn: "经理", pinyin: "jīng lǐ", uz: "Menejer", en: "Manager" },
+                    { cn: "司机", pinyin: "sī jī", uz: "Haydovchi", en: "Driver" }
+                ]
+            },
+            {
+                id: 10,
+                title: "第10课：时间",
+                words: [
+                    { cn: "点", pinyin: "diǎn", uz: "Soat (vaqt)", en: "O'clock" },
+                    { cn: "零", pinyin: "líng", uz: "Nol", en: "Zero" },
+                    { cn: "分", pinyin: "fēn", uz: "Daqiqa", en: "Minute" },
+                    { cn: "刻", pinyin: "kè", uz: "Chorak (15 daqiqa)", en: "Quarter" },
+                    { cn: "两", pinyin: "liǎng", uz: "Ikki (miqdor)", en: "Two" },
+                    { cn: "现", pinyin: "xiàn", uz: "Hozirgi", en: "Present" },
+                    { cn: "现在", pinyin: "xiàn zài", uz: "Hozir", en: "Now" },
+                    { cn: "表", pinyin: "biǎo", uz: "Soat (buyum)", en: "Watch" },
+                    { cn: "差", pinyin: "chà", uz: "Kam (vaqtda)", en: "Fall short of" }
+                ]
+            },
+            {
+                id: 11,
+                title: "第11课：日常起居",
+                words: [
+                    { cn: "早", pinyin: "zǎo", uz: "Erta", en: "Early" },
+                    { cn: "早上", pinyin: "zǎo shang", uz: "Ertalab", en: "Morning" },
+                    { cn: "午", pinyin: "wǔ", uz: "Tush", en: "Noon" },
+                    { cn: "上午", pinyin: "shàng wǔ", uz: "Tushgacha", en: "Morning (before noon)" },
+                    { cn: "中午", pinyin: "zhōng wǔ", uz: "Tush payti", en: "Noon" },
+                    { cn: "下", pinyin: "xià", uz: "Past / Keyin", en: "Down / Below" },
+                    { cn: "下午", pinyin: "xià wǔ", uz: "Tushdan keyin", en: "Afternoon" },
+                    { cn: "晚", pinyin: "wǎn", uz: "Kech", en: "Late / Evening" },
+                    { cn: "晚上", pinyin: "wǎn shang", uz: "Kechqurun", en: "Evening" },
+                    { cn: "起", pinyin: "qǐ", uz: "Turmoq", en: "Rise" },
+                    { cn: "床", pinyin: "chuáng", uz: "Yotoq", en: "Bed" },
+                    { cn: "起床", pinyin: "qǐ chuáng", uz: "Uyg'onmoq", en: "Get up" },
+                    { cn: "吃", pinyin: "chī", uz: "Yemoq", en: "Eat" },
+                    { cn: "饭", pinyin: "fàn", uz: "Ovqat / Guruch", en: "Meal / Rice" },
+                    { cn: "早饭", pinyin: "zǎo fàn", uz: "Nonushta", en: "Breakfast" },
+                    { cn: "去", pinyin: "qù", uz: "Bormoq", en: "Go" },
+                    { cn: "上学", pinyin: "shàng xué", uz: "Maktabga borish", en: "Go to school" },
+                    { cn: "课", pinyin: "kè", uz: "Dars", en: "Class / Lesson" },
+                    { cn: "上课", pinyin: "shàng kè", uz: "Dars boshlanishi", en: "Attend class" },
+                    { cn: "放", pinyin: "fàng", uz: "Qo'yib yubormoq", en: "Let go" },
+                    { cn: "放学", pinyin: "fàng xué", uz: "Dars tugashi", en: "Finish school" },
+                    { cn: "睡", pinyin: "shuì", uz: "Uxlamoq", en: "Sleep" },
+                    { cn: "觉", pinyin: "jiào", uz: "Uyqu", en: "Sleep" },
+                    { cn: "睡觉", pinyin: "shuì jiào", uz: "Uxlamoq", en: "Sleep" }
+                ]
+            },
+            {
+                id: 12,
+                title: "第12课：交通工具",
+                words: [
+                    { cn: "开", pinyin: "kāi", uz: "Haydamoq / Ochmoq", en: "Drive / Open" },
+                    { cn: "车", pinyin: "chē", uz: "Mashina", en: "Vehicle / Car" },
+                    { cn: "开车", pinyin: "kāi chē", uz: "Mashina haydamoq", en: "Drive a car" },
+                    { cn: "班", pinyin: "bān", uz: "Ish / Sinf", en: "Work shift / Class" },
+                    { cn: "上班", pinyin: "shàng bān", uz: "Ishga borish", en: "Go to work" },
+                    { cn: "走", pinyin: "zǒu", uz: "Yurmoq", en: "Walk" },
+                    { cn: "路", pinyin: "lù", uz: "Yo'l", en: "Road" },
+                    { cn: "走路", pinyin: "zǒu lù", uz: "Piyoda yurish", en: "Walk" },
+                    { cn: "每", pinyin: "měi", uz: "Har", en: "Every" },
+                    { cn: "每天", pinyin: "měi tiān", uz: "Har kuni", en: "Every day" },
+                    { cn: "坐", pinyin: "zuò", uz: "O'tirmoq / Minmoq", en: "Sit / Travel by" },
+                    { cn: "校", pinyin: "xiào", uz: "Maktab", en: "School" },
+                    { cn: "校车", pinyin: "xiào chē", uz: "Maktab avtobusi", en: "School bus" },
+                    { cn: "怎", pinyin: "zěn", uz: "Qanday", en: "How" },
+                    { cn: "怎么", pinyin: "zěn me", uz: "Qanday qilib", en: "How" },
+                    { cn: "火", pinyin: "huǒ", uz: "Olov", en: "Fire" },
+                    { cn: "火车", pinyin: "huǒ chē", uz: "Poyezd", en: "Train" },
+                    { cn: "租", pinyin: "zū", uz: "Ijaraga olmoq", en: "Rent" },
+                    { cn: "出租车", pinyin: "chū zū chē", uz: "Taksi", en: "Taxi" },
+                    { cn: "公", pinyin: "gōng", uz: "Jamoat", en: "Public" },
+                    { cn: "共", pinyin: "gòng", uz: "Umumiy", en: "Common" },
+                    { cn: "公共", pinyin: "gōng gòng", uz: "Jamoat", en: "Public" },
+                    { cn: "汽", pinyin: "qì", uz: "Bug' / Gaz", en: "Gas / Steam" },
+                    { cn: "汽车", pinyin: "qì chē", uz: "Avtomobil", en: "Car" },
+                    { cn: "公共汽车", pinyin: "gōng gòng qì chē", uz: "Avtobus", en: "Bus" },
+                    { cn: "地", pinyin: "dì", uz: "Yer", en: "Ground" },
+                    { cn: "铁", pinyin: "tiě", uz: "Temir", en: "Iron" },
+                    { cn: "地铁", pinyin: "dì tiě", uz: "Metro", en: "Subway" },
+                    { cn: "电车", pinyin: "diàn chē", uz: "Tramvay", en: "Tram" },
+                    { cn: "飞机", pinyin: "fēi jī", uz: "Samolyot", en: "Plane" },
+                    { cn: "渡船", pinyin: "dù chuán", uz: "Parom", en: "Ferry" }
+                ]
+            },
+            {
+                id: 13,
+                title: "第13课：颜色",
+                words: [
+                    { cn: "颜色", pinyin: "yán sè", uz: "Rang", en: "Colour" },
+                    { cn: "红", pinyin: "hóng", uz: "Qizil", en: "Red" },
+                    { cn: "黄", pinyin: "huáng", uz: "Sariq", en: "Yellow" },
+                    { cn: "蓝", pinyin: "lán", uz: "Ko'k", en: "Blue" },
+                    { cn: "绿", pinyin: "lǜ", uz: "Yashil", en: "Green" },
+                    { cn: "白", pinyin: "bái", uz: "Oq", en: "White" },
+                    { cn: "黑", pinyin: "hēi", uz: "Qora", en: "Black" },
+                    { cn: "橙", pinyin: "chéng", uz: "Apelsin rang", en: "Orange" },
+                    { cn: "紫", pinyin: "zǐ", uz: "Binafsha", en: "Purple" },
+                    { cn: "棕", pinyin: "zōng", uz: "Jigarrang", en: "Brown" },
+                    { cn: "灰", pinyin: "huī", uz: "Kulrang", en: "Grey" },
+                    { cn: "粉红", pinyin: "fěn hóng", uz: "Pushti", en: "Pink" }
+                ]
+            },
+            {
+                id: 14,
+                title: "第14课：穿着",
+                words: [
+                    { cn: "穿", pinyin: "chuān", uz: "Kiymoq", en: "To wear" },
+                    { cn: "衣服", pinyin: "yī fu", uz: "Kiyim", en: "Clothes" },
+                    { cn: "衬衫", pinyin: "chèn shān", uz: "Ko'ylak", en: "Shirt" },
+                    { cn: "牛仔裤", pinyin: "niú zǎi kù", uz: "Jinsi shim", en: "Jeans" },
+                    { cn: "裙子", pinyin: "qún zi", uz: "Yubka", en: "Skirt" },
+                    { cn: "校服", pinyin: "xiào fú", uz: "Maktab formasi", en: "School uniform" },
+                    { cn: "汗衫", pinyin: "hàn shān", uz: "Futbolka", en: "T-shirt" },
+                    { cn: "短裤", pinyin: "duǎn kù", uz: "Kalta shim", en: "Shorts" },
+                    { cn: "毛衣", pinyin: "máo yī", uz: "Jemfer", en: "Sweater" },
+                    { cn: "鞋子", pinyin: "xié zi", uz: "Oyoq kiyim", en: "Shoes" },
+                    { cn: "袜子", pinyin: "wà zi", uz: "Paypoq", en: "Socks" }
+                ]
+            },
+            {
+                id: 15,
+                title: "第15课：人体部位",
+                words: [
+                    { cn: "头", pinyin: "tóu", uz: "Bosh", en: "Head" },
+                    { cn: "头发", pinyin: "tóu fa", uz: "Soch", en: "Hair" },
+                    { cn: "眼睛", pinyin: "yǎn jing", uz: "Ko'z", en: "Eye" },
+                    { cn: "耳朵", pinyin: "ěr duo", uz: "Quloq", en: "Ear" },
+                    { cn: "鼻子", pinyin: "bí zi", uz: "Burun", en: "Nose" },
+                    { cn: "嘴巴", pinyin: "zuǐ ba", uz: "Og'iz", en: "Mouth" },
+                    { cn: "手", pinyin: "shǒu", uz: "Qo'l", en: "Hand" },
+                    { cn: "脚", pinyin: "jiǎo", uz: "Oyoq", en: "Foot" },
+                    { cn: "腿", pinyin: "tuǐ", uz: "Oyoq (son)", en: "Leg" },
+                    { cn: "脸", pinyin: "liǎn", uz: "Yuz", en: "Face" },
+                    { cn: "长", pinyin: "cháng", uz: "Uzun", en: "Long" },
+                    { cn: "短", pinyin: "duǎn", uz: "Qisqa", en: "Short" }
+                ]
+            }
+        ];
+
+        const TelegramIcon = ({ className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-1.962 9.612-2.215 10.687-.106.452-.229.589-.379.601-.334.025-.922-.216-1.433-.538-2.197-1.399-3.439-2.268-5.572-3.636-.614-.393-.174-.82.263-1.258 1.139-1.139 3.32-3.23 3.376-3.321.007-.011.013-.053-.005-.079-.018-.025-.128-.034-.216-.013-2.059 1.341-5.807 3.847-5.93 3.882-.549.153-1.047.234-1.489.224-.49-.011-1.434-.277-2.133-.504-1.737-.559-.684-1.748.188-2.104 4.103-1.805 8.375-3.697 10.147-4.475 4.805-2.107 5.807-2.473 6.45-2.487.143-.003.462.033.668.201.171.14.219.33.242.513.022.183.041.447.014.647z"/>
+            </svg>
+        );
+
+        const SpeakerIcon = ({ onClick, className }) => (
+            <div onClick={(e) => { e.stopPropagation(); onClick(); }} className={`cursor-pointer hover:text-green-600 transition-colors p-2 ${className}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
+            </div>
+        );
+
+        const Flashcard = ({ word }) => {
+            const [flipped, setFlipped] = useState(false);
+
+            const playAudio = () => {
+                const utterance = new SpeechSynthesisUtterance(word.cn);
+                utterance.lang = 'zh-CN';
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const getFontSize = (text) => {
+                const len = text.length;
+                if (len <= 1) return 60;
+                if (len === 2) return 40;
+                if (len === 3) return 28;
+                if (len >= 4) return 22;
+                return 20;
+            };
+
+            return (
+                <div 
+                    className={`card w-full h-48 sm:h-56 cursor-pointer relative perspective-1000 group ${flipped ? 'is-flipped' : ''}`}
+                    onClick={() => setFlipped(!flipped)}
+                >
+                    <div className="card-inner w-full h-full relative text-center shadow-lg rounded-2xl">
+                        <div className="card-front bg-white flex flex-col justify-center items-center p-4 border-2 border-green-100 rounded-2xl">
+                            <div className="absolute top-2 right-2">
+                                <SpeakerIcon onClick={playAudio} className="text-gray-400" />
+                            </div>
+                            <svg viewBox="0 0 100 100" className="w-24 h-24 sm:w-32 sm:h-32 mb-2">
+                                <text 
+                                    x="50" 
+                                    y="50" 
+                                    textAnchor="middle" 
+                                    dominantBaseline="central"
+                                    fontSize={getFontSize(word.cn)} 
+                                    fill="#15803d" 
+                                    className="cn-font font-bold" 
+                                    style={{fontWeight: 700}}
+                                >
+                                    {word.cn}
+                                </text>
+                            </svg>
+                            <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">Bosing</p>
+                        </div>
+
+                        <div className="card-back bg-green-50 flex flex-col justify-center items-center p-4 border-2 border-green-400 rounded-2xl">
+                            <div className="absolute top-2 right-2">
+                                <SpeakerIcon onClick={playAudio} className="text-green-700" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-1">{word.pinyin}</h3>
+                            <div className="w-16 h-1 bg-green-400 rounded-full mb-2"></div>
+                            <p className="text-lg text-green-800 font-semibold">{word.uz}</p>
+                            <p className="text-sm text-gray-500 italic mt-1">{word.en}</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Quiz = ({ words, onFinish }) => {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [score, setScore] = useState(0);
+            const [showResult, setShowResult] = useState(false);
+            const [shuffledOptions, setShuffledOptions] = useState([]);
+            const [isAnswered, setIsAnswered] = useState(false);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [showPinyin, setShowPinyin] = useState(false);
+
+            useEffect(() => {
+                if (words.length > 0 && currentQuestion < words.length) {
+                    const correct = words[currentQuestion];
+                    const others = words.filter(w => w !== correct);
+                    const wrong = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+                    const options = [...wrong, correct].sort(() => 0.5 - Math.random());
+                    setShuffledOptions(options);
+                    setIsAnswered(false);
+                    setSelectedOption(null);
+                    setShowPinyin(false);
+                }
+            }, [currentQuestion, words]);
+
+            const playAudio = () => {
+                const utterance = new SpeechSynthesisUtterance(words[currentQuestion].cn);
+                utterance.lang = 'zh-CN';
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const handleSpeakerClick = () => {
+                playAudio();
+                setShowPinyin(true);
+            };
+
+            const handleAnswer = (selectedWord) => {
+                if (isAnswered) return;
+                setIsAnswered(true);
+                setSelectedOption(selectedWord);
+
+                if (selectedWord.cn === words[currentQuestion].cn) {
+                    setScore(score + 1);
+                    playAudio();
+                }
+                
+                setTimeout(() => {
+                    const nextQuestion = currentQuestion + 1;
+                    if (nextQuestion < words.length) {
+                        setCurrentQuestion(nextQuestion);
+                    } else {
+                        setShowResult(true);
+                    }
+                }, 1500);
+            };
+
+            const resetQuiz = () => {
+                setCurrentQuestion(0);
+                setScore(0);
+                setShowResult(false);
+                setIsAnswered(false);
+                setSelectedOption(null);
+            };
+
+            if (words.length === 0) return <div>So'zlar mavjud emas.</div>;
+
+            if (showResult) {
+                return (
+                    <div className="text-center p-8 bg-white rounded-xl shadow-lg border-2 border-green-200">
+                        <div className="mb-4">
+                            <svg className="w-20 h-20 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Natija</h2>
+                        <p className="text-xl mb-6">Siz {words.length} tadan {score} ta to'g'ri topdingiz!</p>
+                        <div className="flex justify-center gap-4 flex-col sm:flex-row">
+                            <button onClick={resetQuiz} className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition text-lg w-full sm:w-auto">Qayta ishlash</button>
+                            <button onClick={onFinish} className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition text-lg w-full sm:w-auto">Darsga qaytish</button>
+                        </div>
+                    </div>
+                );
+            }
+
+            const currentWord = words[currentQuestion];
+
+            return (
+                <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 border border-green-100">
+                    <div className="flex justify-between items-center mb-6 text-sm text-gray-500">
+                        <span>Savol {currentQuestion + 1} / {words.length}</span>
+                        <span>Ball: {score}</span>
+                    </div>
+                    
+                    <div className="text-center mb-8 relative">
+                        <h2 className="text-5xl sm:text-6xl font-bold text-green-600 cn-font mb-2">{currentWord.cn}</h2>
+                        
+                        <div className={`text-xl text-gray-500 font-semibold h-8 transition-opacity duration-300 ${showPinyin ? 'opacity-100' : 'opacity-0'}`}>
+                            {currentWord.pinyin}
+                        </div>
+
+                        <div className="absolute top-0 right-0 sm:right-10">
+                             <SpeakerIcon onClick={handleSpeakerClick} className="text-gray-400 hover:text-green-500" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {shuffledOptions.map((option, idx) => {
+                            let btnClass = "p-4 border-2 rounded-xl text-lg font-medium transition min-h-[60px] ";
+                            
+                            if (isAnswered) {
+                                if (option.cn === currentWord.cn) {
+                                    btnClass += "bg-green-100 border-green-500 text-green-800";
+                                } else if (selectedOption === option) {
+                                    btnClass += "bg-red-100 border-red-500 text-red-800";
+                                } else {
+                                    btnClass += "border-gray-200 text-gray-400 opacity-50";
+                                }
+                            } else {
+                                btnClass += "border-gray-200 hover:border-green-500 hover:bg-green-50 text-gray-700 active:bg-green-100";
+                            }
+
+                            return (
+                                <button 
+                                    key={idx}
+                                    onClick={() => handleAnswer(option)}
+                                    disabled={isAnswered}
+                                    className={btnClass}
+                                >
+                                    {option.uz}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [currentLessonId, setCurrentLessonId] = useState(1);
+            const [mode, setMode] = useState('learn');
+            const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+            const currentLesson = lessonData.find(l => l.id === currentLessonId);
+
+            return (
+                <div className="min-h-screen flex flex-col md:flex-row relative">
+                    <div className="md:hidden bg-green-600 text-white p-4 flex justify-between items-center shadow-md z-30 sticky top-0">
+                        <h1 className="text-lg font-bold truncate pr-4">{currentLesson.title}</h1>
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isSidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {isSidebarOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                            onClick={() => setIsSidebarOpen(false)}
+                        ></div>
+                    )}
+
+                    <div className={`
+                        fixed md:static inset-y-0 left-0 w-72 bg-white shadow-xl transform 
+                        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+                        md:translate-x-0 transition-transform duration-300 ease-in-out z-50 flex flex-col
+                    `}>
+                        <div className="p-6 bg-green-600 text-white hidden md:block">
+                            <h1 className="text-2xl font-bold mb-2">轻松学中文</h1>
+                            <p className="text-green-100 text-sm font-medium flex items-center gap-1">
+                                Design by Dilfuza <TelegramIcon className="w-4 h-4 inline-block" /> @diffila
+                            </p>
+                            <p className="text-green-100 text-sm mt-1">Kāng lǎo shī bilan xitoy tilini o'rganmiz</p>
+                        </div>
+                        
+                        <div className="flex-1 overflow-y-auto lesson-scroll p-4">
+                            <div className="flex justify-between items-center mb-4 md:hidden">
+                                <h3 className="text-lg font-bold text-gray-800">Darslar</h3>
+                                <button onClick={() => setIsSidebarOpen(false)} className="text-gray-500 p-2">
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 hidden md:block">Darslar (Lessons)</h3>
+                            <ul className="space-y-2 pb-20 md:pb-0">
+                                {lessonData.map(lesson => (
+                                    <li key={lesson.id}>
+                                        <button 
+                                            onClick={() => {
+                                                setCurrentLessonId(lesson.id);
+                                                setMode('learn');
+                                                setIsSidebarOpen(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-4 md:py-3 rounded-lg transition-colors flex items-center justify-between ${
+                                                currentLessonId === lesson.id 
+                                                ? 'bg-green-100 text-green-700 font-bold' 
+                                                : 'text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            <span className="truncate text-base">{lesson.title}</span>
+                                            {currentLessonId === lesson.id && (
+                                                <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 ml-2"></span>
+                                            )}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="p-4 border-t text-xs text-center text-gray-400 hidden md:block">
+                            Based on "Easy Steps to Chinese"
+                        </div>
+                    </div>
+
+                    <div className="flex-1 p-4 md:p-8 overflow-y-auto h-screen bg-gray-50 md:bg-[#f0fdf4]">
+                        
+                        <div className="max-w-5xl mx-auto mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 hidden md:flex">
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-gray-800">{currentLesson.title}</h2>
+                                <p className="text-gray-500 mt-1">{currentLesson.words.length} ta yangi so'z</p>
+                            </div>
+                            
+                            <div className="bg-white p-1 rounded-lg shadow-sm border border-gray-200 flex">
+                                <button 
+                                    onClick={() => setMode('learn')}
+                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                        mode === 'learn' 
+                                        ? 'bg-green-500 text-white shadow-sm' 
+                                        : 'text-gray-500 hover:text-green-600'
+                                    }`}
+                                >
+                                    O'rganish
+                                </button>
+                                <button 
+                                    onClick={() => setMode('quiz')}
+                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                        mode === 'quiz' 
+                                        ? 'bg-green-500 text-white shadow-sm' 
+                                        : 'text-gray-500 hover:text-green-600'
+                                    }`}
+                                >
+                                    Sinov (Quiz)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="md:hidden mb-6 sticky top-0 z-20 pt-2 pb-2 bg-gray-50">
+                             <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 flex">
+                                <button 
+                                    onClick={() => setMode('learn')}
+                                    className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${
+                                        mode === 'learn' 
+                                        ? 'bg-green-500 text-white shadow-md' 
+                                        : 'text-gray-500'
+                                    }`}
+                                >
+                                    O'rganish
+                                </button>
+                                <button 
+                                    onClick={() => setMode('quiz')}
+                                    className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${
+                                        mode === 'quiz' 
+                                        ? 'bg-green-500 text-white shadow-md' 
+                                        : 'text-gray-500'
+                                    }`}
+                                >
+                                    Sinov
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="max-w-5xl mx-auto pb-10">
+                            {mode === 'learn' ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                                    {currentLesson.words.map((word, index) => (
+                                        <Flashcard key={index} word={word} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <Quiz words={currentLesson.words} onFinish={() => setMode('learn')} />
+                            )}
+                        </div>
+
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
