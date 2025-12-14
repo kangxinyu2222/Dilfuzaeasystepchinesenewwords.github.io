@@ -59,6 +59,7 @@
             {
                 id: 1,
                 title: "第2课：拼音、数字",
+                title_en: "Pinyin, Numbers",
                 words: [
                     { cn: "一", pinyin: "yī", uz: "Bir", en: "One" },
                     { cn: "二", pinyin: "èr", uz: "Ikki", en: "Two" },
@@ -80,6 +81,7 @@
             {
                 id: 2,
                 title: "第3课：问候 (一)",
+                title_en: "Greetings (1)",
                 words: [
                     { cn: "您", pinyin: "nín", uz: "Siz (hurmat bilan)", en: "You (polite)" },
                     { cn: "好", pinyin: "hǎo", uz: "Yaxshi", en: "Good / Well" },
@@ -94,6 +96,7 @@
             {
                 id: 3,
                 title: "第3课：问候 (二)",
+                title_en: "Greetings (2)",
                 words: [
                     { cn: "叫", pinyin: "jiào", uz: "Chaqirmoq / Ismi ...", en: "To be called" },
                     { cn: "什么", pinyin: "shén me", uz: "Nima", en: "What" },
@@ -109,6 +112,7 @@
             {
                 id: 4,
                 title: "第4课：日期",
+                title_en: "Dates",
                 words: [
                     { cn: "月", pinyin: "yuè", uz: "Oy", en: "Month" },
                     { cn: "星", pinyin: "xīng", uz: "Yulduz", en: "Star" },
@@ -134,6 +138,7 @@
             {
                 id: 5,
                 title: "第5课：年龄",
+                title_en: "Age",
                 words: [
                     { cn: "在", pinyin: "zài", uz: "da (joylashuv)", en: "At / In / On" },
                     { cn: "出", pinyin: "chū", uz: "Chiqmoq", en: "Go out" },
@@ -154,6 +159,7 @@
             {
                 id: 6,
                 title: "第6课：电话号码",
+                title_en: "Telephone Numbers",
                 words: [
                     { cn: "家", pinyin: "jiā", uz: "Uy / Oila", en: "Family / Home" },
                     { cn: "电", pinyin: "diàn", uz: "Elektr", en: "Electricity" },
@@ -173,6 +179,7 @@
             {
                 id: 7,
                 title: "第7课：家庭成员",
+                title_en: "Family Members",
                 words: [
                     { cn: "有", pinyin: "yǒu", uz: "Bor bo'lmoq", en: "To have" },
                     { cn: "口", pinyin: "kǒu", uz: "Og'iz / Jon", en: "Mouth / Measure word" },
@@ -200,6 +207,7 @@
             {
                 id: 8,
                 title: "第8课：自我介绍",
+                title_en: "Self-introduction",
                 words: [
                     { cn: "没", pinyin: "méi", uz: "Yo'q", en: "No" },
                     { cn: "没有", pinyin: "méi yǒu", uz: "Yo'q (bor emas)", en: "Not have" },
@@ -234,6 +242,7 @@
             {
                 id: 9,
                 title: "第9课：职业",
+                title_en: "Occupation",
                 words: [
                     { cn: "工", pinyin: "gōng", uz: "Ish", en: "Work" },
                     { cn: "作", pinyin: "zuò", uz: "Bajarmoq", en: "Do / Make" },
@@ -268,6 +277,7 @@
             {
                 id: 10,
                 title: "第10课：时间",
+                title_en: "Time",
                 words: [
                     { cn: "点", pinyin: "diǎn", uz: "Soat (vaqt)", en: "O'clock" },
                     { cn: "零", pinyin: "líng", uz: "Nol", en: "Zero" },
@@ -283,6 +293,7 @@
             {
                 id: 11,
                 title: "第11课：日常起居",
+                title_en: "Daily Routine",
                 words: [
                     { cn: "早", pinyin: "zǎo", uz: "Erta", en: "Early" },
                     { cn: "早上", pinyin: "zǎo shang", uz: "Ertalab", en: "Morning" },
@@ -313,6 +324,7 @@
             {
                 id: 12,
                 title: "第12课：交通工具",
+                title_en: "Means of Transport",
                 words: [
                     { cn: "开", pinyin: "kāi", uz: "Haydamoq / Ochmoq", en: "Drive / Open" },
                     { cn: "车", pinyin: "chē", uz: "Mashina", en: "Vehicle / Car" },
@@ -350,6 +362,7 @@
             {
                 id: 13,
                 title: "第13课：颜色",
+                title_en: "Colours",
                 words: [
                     { cn: "颜色", pinyin: "yán sè", uz: "Rang", en: "Colour" },
                     { cn: "红", pinyin: "hóng", uz: "Qizil", en: "Red" },
@@ -368,6 +381,7 @@
             {
                 id: 14,
                 title: "第14课：穿着",
+                title_en: "Clothing",
                 words: [
                     { cn: "穿", pinyin: "chuān", uz: "Kiymoq", en: "To wear" },
                     { cn: "衣服", pinyin: "yī fu", uz: "Kiyim", en: "Clothes" },
@@ -385,6 +399,7 @@
             {
                 id: 15,
                 title: "第15课：人体部位",
+                title_en: "Parts of the Body",
                 words: [
                     { cn: "头", pinyin: "tóu", uz: "Bosh", en: "Head" },
                     { cn: "头发", pinyin: "tóu fa", uz: "Soch", en: "Hair" },
@@ -483,11 +498,25 @@
             const [isAnswered, setIsAnswered] = useState(false);
             const [selectedOption, setSelectedOption] = useState(null);
             const [showPinyin, setShowPinyin] = useState(false);
+            const [quizWords, setQuizWords] = useState([]);
 
             useEffect(() => {
-                if (words.length > 0 && currentQuestion < words.length) {
-                    const correct = words[currentQuestion];
-                    const others = words.filter(w => w !== correct);
+                if (words.length > 0) {
+                    const shuffled = [...words].sort(() => Math.random() - 0.5);
+                    setQuizWords(shuffled);
+                    setCurrentQuestion(0);
+                    setScore(0);
+                    setShowResult(false);
+                    setIsAnswered(false);
+                    setSelectedOption(null);
+                    setShowPinyin(false);
+                }
+            }, [words]);
+
+            useEffect(() => {
+                if (quizWords.length > 0 && currentQuestion < quizWords.length) {
+                    const correct = quizWords[currentQuestion];
+                    const others = words.filter(w => w.cn !== correct.cn);
                     const wrong = others.sort(() => 0.5 - Math.random()).slice(0, 3);
                     const options = [...wrong, correct].sort(() => 0.5 - Math.random());
                     setShuffledOptions(options);
@@ -495,10 +524,10 @@
                     setSelectedOption(null);
                     setShowPinyin(false);
                 }
-            }, [currentQuestion, words]);
+            }, [currentQuestion, quizWords, words]);
 
             const playAudio = () => {
-                const utterance = new SpeechSynthesisUtterance(words[currentQuestion].cn);
+                const utterance = new SpeechSynthesisUtterance(quizWords[currentQuestion].cn);
                 utterance.lang = 'zh-CN';
                 window.speechSynthesis.speak(utterance);
             };
@@ -513,14 +542,14 @@
                 setIsAnswered(true);
                 setSelectedOption(selectedWord);
 
-                if (selectedWord.cn === words[currentQuestion].cn) {
+                if (selectedWord.cn === quizWords[currentQuestion].cn) {
                     setScore(score + 1);
                     playAudio();
                 }
                 
                 setTimeout(() => {
                     const nextQuestion = currentQuestion + 1;
-                    if (nextQuestion < words.length) {
+                    if (nextQuestion < quizWords.length) {
                         setCurrentQuestion(nextQuestion);
                     } else {
                         setShowResult(true);
@@ -529,11 +558,14 @@
             };
 
             const resetQuiz = () => {
+                const shuffled = [...words].sort(() => Math.random() - 0.5);
+                setQuizWords(shuffled);
                 setCurrentQuestion(0);
                 setScore(0);
                 setShowResult(false);
                 setIsAnswered(false);
                 setSelectedOption(null);
+                setShowPinyin(false);
             };
 
             if (words.length === 0) return <div>So'zlar mavjud emas.</div>;
@@ -556,7 +588,9 @@
                 );
             }
 
-            const currentWord = words[currentQuestion];
+            if (quizWords.length === 0) return <div>Yuklanmoqda...</div>;
+
+            const currentWord = quizWords[currentQuestion];
 
             return (
                 <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 border border-green-100">
@@ -639,12 +673,12 @@
                         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
                         md:translate-x-0 transition-transform duration-300 ease-in-out z-50 flex flex-col
                     `}>
-                        <div className="p-6 bg-green-600 text-white">
-                            <h1 className="text-2xl font-bold mb-2">轻松学中文</h1>
-                            <p className="text-green-100 text-sm font-medium flex items-center gap-1">
-                                Design by Dilfuza <TelegramIcon className="w-4 h-4 inline-block" /> @diffila
+                        <div className="p-4 bg-green-600 text-white">
+                            <h1 className="text-xl font-bold mb-1">轻松学中文</h1>
+                            <p className="text-green-100 text-xs mt-0 whitespace-nowrap mb-1">Kāng lǎo shī bilan xitoy tilini o'rganmiz</p>
+                            <p className="text-green-100 text-xs font-medium flex items-center gap-1">
+                                Design by Dilfuza <TelegramIcon className="w-3 h-3 inline-block" /> @diffila
                             </p>
-                            <p className="text-green-100 text-sm mt-1">Kāng lǎo shī bilan xitoy tilini o'rganmiz</p>
                         </div>
                         
                         <div className="flex-1 overflow-y-auto lesson-scroll p-4">
@@ -664,16 +698,21 @@
                                                 setMode('learn');
                                                 setIsSidebarOpen(false);
                                             }}
-                                            className={`w-full text-left px-4 py-4 md:py-3 rounded-lg transition-colors flex items-center justify-between ${
+                                            className={`w-full text-left px-4 py-4 md:py-3 rounded-lg transition-colors flex flex-col items-start justify-center ${
                                                 currentLessonId === lesson.id 
-                                                ? 'bg-green-100 text-green-700 font-bold' 
-                                                : 'text-gray-600 hover:bg-gray-100'
+                                                ? 'bg-green-100' 
+                                                : 'hover:bg-gray-100'
                                             }`}
                                         >
-                                            <span className="truncate text-base">{lesson.title}</span>
-                                            {currentLessonId === lesson.id && (
-                                                <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 ml-2"></span>
-                                            )}
+                                            <div className="flex items-center justify-between w-full">
+                                                <span className={`text-base font-medium truncate ${currentLessonId === lesson.id ? 'text-green-700' : 'text-gray-700'}`}>
+                                                    {lesson.title}
+                                                </span>
+                                                {currentLessonId === lesson.id && (
+                                                    <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 ml-2"></span>
+                                                )}
+                                            </div>
+                                            <span className="text-xs text-gray-400 mt-0.5">{lesson.title_en}</span>
                                         </button>
                                     </li>
                                 ))}
