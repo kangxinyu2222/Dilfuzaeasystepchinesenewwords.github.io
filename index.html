@@ -513,11 +513,29 @@
                 }
             }, [words]);
 
+            // Updated logic to prevent duplicate answer meanings
             useEffect(() => {
                 if (quizWords.length > 0 && currentQuestion < quizWords.length) {
                     const correct = quizWords[currentQuestion];
-                    const others = words.filter(w => w.cn !== correct.cn);
-                    const wrong = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+                    
+                    // Filter candidates: exclude the correct word itself AND words with the exact same translation
+                    const candidates = words.filter(w => w.cn !== correct.cn && w.uz !== correct.uz);
+                    
+                    // Shuffle candidates
+                    const shuffledCandidates = [...candidates].sort(() => 0.5 - Math.random());
+                    
+                    // Select 3 unique wrong answers (ensure no duplicate meanings among distractors)
+                    const wrong = [];
+                    const seenMeanings = new Set();
+                    
+                    for (const w of shuffledCandidates) {
+                        if (!seenMeanings.has(w.uz)) {
+                            wrong.push(w);
+                            seenMeanings.add(w.uz);
+                        }
+                        if (wrong.length === 3) break;
+                    }
+                    
                     const options = [...wrong, correct].sort(() => 0.5 - Math.random());
                     setShuffledOptions(options);
                     setIsAnswered(false);
